@@ -1,0 +1,16 @@
+Title: Biological Age Calculator
+Version: 1.0.0
+Description: Calculate your biological age using the Klemera-Doubal Method (KDM) based on blood biomarkers.
+Author: Filipa Santos Rodrigues
+License: MIT
+Encoding: UTF-8
+Depends:
+    R (>= 4.0.0)
+Imports:
+    shiny,
+    dplyr,
+    DT,
+    ggplot2,
+    BioAge
+Remotes:
+    dayoonkwon/BioAge
