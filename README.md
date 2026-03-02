@@ -90,9 +90,9 @@ Deploy using the standard Shiny deployment workflow.
 
 | Result | Meaning |
 |--------|---------|
-| **Biological < Chronological** | 🌟 You're aging slower than average |
-| **Biological ≈ Chronological** | 👍 You're aging at a typical pace |
-| **Biological > Chronological** | ⚠️ Consider lifestyle improvements |
+| **Biological < Chronological** | You're aging slower than average |
+| **Biological ≈ Chronological** | You're aging at a typical pace |
+| **Biological > Chronological** | Consider lifestyle improvements |
 
 ## Scientific References
 
