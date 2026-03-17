@@ -46,6 +46,11 @@ ui <- fluidPage(
                                              buttonLabel = "Browse...",
                                              placeholder = "No files selected"),
                                    uiOutput("upload_status"),
+                                   div(style = "background-color: #fff8e6; border: 1px solid #f5c518; border-radius: 8px; padding: 8px 10px; margin-top: 8px;",
+                                       p(style = "font-size: 11px; color: #8a6d00; margin: 0;",
+                                         tags$strong("Note: "), "PDF extraction may have errors. Please double-check the extracted values before calculating."
+                                       )
+                                   ),
                                    div(style = "text-align: center; color: #86868b; font-size: 11px; margin: 12px 0;",
                                        "— or enter manually below —"
                                    )

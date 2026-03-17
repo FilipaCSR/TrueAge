@@ -24,13 +24,15 @@ BIOMARKER_PATTERNS <- list(
     typical_range = c(20, 300)
   ),
   creatinine = list(
-    names = c("creatinine", "creatinina", "creat", "crea"),
+    names = c("^creatinine", "^creatinina", "^creat\\b", "^crea\\b", "serum creatinine"),
     unit_conversions = list(
       "mg/dL" = 1,
+      "mg/dl" = 1,
       "µmol/L" = 0.0113,  # Convert µmol/L to mg/dL
       "umol/L" = 0.0113
     ),
-    typical_range = c(0.3, 3.0)
+    typical_range = c(0.2, 5.0),
+    use_regex = TRUE
   ),
   hba1c = list(
     names = c("hba1c", "hemoglobin a1c", "a1c", "glycated hemoglobin", "hemoglobina glicada", "hgba1c"),
@@ -127,41 +129,90 @@ extract_text_from_file <- function(file_path, file_type) {
 #' @param text The full text to search
 #' @param biomarker_names Vector of possible names for the biomarker
 #' @param typical_range Expected range for validation
+#' @param use_regex Whether names should be treated as regex patterns
 #' @return Extracted numeric value or NA
-parse_biomarker_value <- function(text, biomarker_names, typical_range = NULL) {
+parse_biomarker_value <- function(text, biomarker_names, typical_range = NULL, use_regex = FALSE) {
   
   text_lower <- tolower(text)
+  
+  # Split text into lines for better table handling
+  lines <- strsplit(text, "\n")[[1]]
+  lines_lower <- tolower(lines)
   
   for (name in biomarker_names) {
     name_lower <- tolower(name)
     
-    # Find position of biomarker name
-    pos <- regexpr(name_lower, text_lower, fixed = TRUE)
+    # Search line by line first (better for tables)
+    for (i in seq_along(lines_lower)) {
+      line <- lines[i]
+      line_lower <- lines_lower[i]
+      
+      # Check if this line contains the biomarker name
+      found <- FALSE
+      if (use_regex) {
+        found <- grepl(name_lower, line_lower, perl = TRUE)
+      } else {
+        found <- grepl(name_lower, line_lower, fixed = TRUE)
+      }
+      
+      if (found) {
+        # Extract all numbers from this line
+        all_numbers <- gregexpr("[0-9]+[.,][0-9]+|[0-9]+", line, perl = TRUE)
+        numbers <- regmatches(line, all_numbers)[[1]]
+        
+        if (length(numbers) > 0) {
+          for (num_str in numbers) {
+            val_str <- gsub(",", ".", num_str)
+            val <- as.numeric(val_str)
+            
+            # Validate against typical range if provided
+            if (!is.na(val) && !is.null(typical_range)) {
+              if (val >= typical_range[1] && val <= typical_range[2]) {
+                return(val)
+              }
+            }
+          }
+          
+          # If no value matched range, try first number (if no range specified)
+          if (is.null(typical_range)) {
+            val_str <- gsub(",", ".", numbers[1])
+            val <- as.numeric(val_str)
+            if (!is.na(val) && val > 0) {
+              return(val)
+            }
+          }
+        }
+      }
+    }
+    
+    # Fallback: search in full text
+    if (use_regex) {
+      pos_match <- regexpr(name_lower, text_lower, perl = TRUE)
+      pos <- as.integer(pos_match)
+    } else {
+      pos <- regexpr(name_lower, text_lower, fixed = TRUE)
+    }
     
     if (pos > 0) {
-      # Extract surrounding context (200 chars after the name)
-      start <- pos
-      end <- min(pos + 200, nchar(text))
-      context <- substr(text, start, end)
+      # Extract text AFTER the biomarker name
+      match_length <- if (use_regex) attr(pos_match, "match.length") else nchar(name)
+      start_after_name <- pos + match_length
+      end <- min(start_after_name + 100, nchar(text))
+      context_after <- substr(text, start_after_name, end)
       
-      # Look for numeric values (handles decimals, commas as decimal separators)
-      # Pattern: number possibly followed by decimal (. or ,) and more digits
-      matches <- gregexpr("[0-9]+[.,]?[0-9]*", context)
-      values <- regmatches(context, matches)[[1]]
+      # Find all numbers in context
+      all_matches <- gregexpr("[0-9]+[.,][0-9]+|[0-9]+", context_after, perl = TRUE)
+      all_values <- regmatches(context_after, all_matches)[[1]]
       
-      if (length(values) > 0) {
-        # Convert comma to period and parse
-        for (val_str in values) {
+      if (length(all_values) > 0) {
+        for (val_str in all_values) {
           val_str <- gsub(",", ".", val_str)
           val <- as.numeric(val_str)
           
-          # Validate against typical range if provided
           if (!is.na(val) && !is.null(typical_range)) {
             if (val >= typical_range[1] && val <= typical_range[2]) {
               return(val)
             }
-          } else if (!is.na(val) && val > 0) {
-            return(val)
           }
         }
       }
@@ -244,10 +295,12 @@ extract_biomarkers_from_text <- function(text) {
     if (bm_name == "sex") {
       results[[bm_name]] <- parse_sex(text)
     } else {
+      use_regex <- isTRUE(pattern$use_regex)
       results[[bm_name]] <- parse_biomarker_value(
         text, 
         pattern$names, 
-        pattern$typical_range
+        pattern$typical_range,
+        use_regex
       )
     }
   }
