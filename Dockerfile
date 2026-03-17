@@ -1,6 +1,6 @@
 FROM rocker/shiny:4.3.2
 
-# Install system dependencies
+# Install system dependencies (including PDF and OCR support)
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -12,10 +12,15 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libharfbuzz-dev \
     libfribidi-dev \
+    libpoppler-cpp-dev \
+    libtesseract-dev \
+    libleptonica-dev \
+    tesseract-ocr \
+    tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages
-RUN R -e "install.packages(c('shiny', 'dplyr', 'DT', 'ggplot2', 'remotes'), repos='https://cran.rstudio.com/')"
+RUN R -e "install.packages(c('shiny', 'dplyr', 'DT', 'ggplot2', 'remotes', 'pdftools', 'tesseract'), repos='https://cran.rstudio.com/')"
 
 # Install BioAge from GitHub
 RUN R -e "remotes::install_github('dayoonkwon/BioAge')"

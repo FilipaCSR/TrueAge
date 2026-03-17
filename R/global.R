@@ -11,6 +11,14 @@ library(dplyr)
 library(ggplot2)
 library(DT)
 
+# Load PDF extraction packages (optional - will work without them)
+if (requireNamespace("pdftools", quietly = TRUE)) {
+  library(pdftools)
+}
+if (requireNamespace("tesseract", quietly = TRUE)) {
+  library(tesseract)
+}
+
 # =============================================================================
 # COLOR PALETTE
 # =============================================================================

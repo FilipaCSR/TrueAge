@@ -35,13 +35,29 @@ ui <- fluidPage(
                       fluidRow(
                         # Input Column - narrower
                         column(3,
+                               # Upload Section
+                               div(class = "apple-card upload-card",
+                                   h3(class = "apple-card-title", "Upload Lab Reports"),
+                                   p(style = "font-size: 12px; color: #86868b; margin-bottom: 12px;",
+                                     "Upload one or more PDFs/images of your lab results to auto-fill values"),
+                                   fileInput("lab_file", NULL,
+                                             accept = c("application/pdf", "image/png", "image/jpeg", "image/jpg"),
+                                             multiple = TRUE,
+                                             buttonLabel = "Browse...",
+                                             placeholder = "No files selected"),
+                                   uiOutput("upload_status"),
+                                   div(style = "text-align: center; color: #86868b; font-size: 11px; margin: 12px 0;",
+                                       "— or enter manually below —"
+                                   )
+                               ),
+                               
                                div(class = "apple-card",
                                    h3(class = "apple-card-title", "Your Information"),
                                
                                    # Demographics - side by side
                                    fluidRow(
-                                     column(6, numericInput("age", "Age", value = 34, min = 20, max = 100)),
-                                     column(6, selectInput("sex", "Sex", choices = c("Female" = 2, "Male" = 1)))
+                                     column(6, numericInput("age", "Age", value = NA, min = 20, max = 100)),
+                                     column(6, selectInput("sex", "Sex", choices = c("Select..." = "", "Female" = 2, "Male" = 1)))
                                    ),
                                
                                hr(style = "border-color: #f5f5f7; margin: 12px 0;"),
@@ -50,15 +66,15 @@ ui <- fluidPage(
                                   "Blood Chemistry"),
                                
                                fluidRow(
-                                 column(6, numericInput("albumin", "Albumin (g/dL)", value = 4.4, min = 1, max = 7, step = 0.1)),
-                                 column(6, numericInput("alp", "ALP (U/L)", value = 47, min = 10, max = 500, step = 1))
+                                 column(6, numericInput("albumin", "Albumin (g/dL)", value = NA, min = 1, max = 7, step = 0.1)),
+                                 column(6, numericInput("alp", "ALP (U/L)", value = NA, min = 10, max = 500, step = 1))
                                ),
                                fluidRow(
-                                 column(6, numericInput("creatinine", "Creatinine (mg/dL)", value = 0.7, min = 0.1, max = 5, step = 0.1)),
-                                 column(6, numericInput("hba1c", "HbA1c (%)", value = 5.6, min = 3, max = 15, step = 0.1))
+                                 column(6, numericInput("creatinine", "Creatinine (mg/dL)", value = NA, min = 0.1, max = 5, step = 0.1)),
+                                 column(6, numericInput("hba1c", "HbA1c (%)", value = NA, min = 3, max = 15, step = 0.1))
                                ),
                                
-                               numericInput("crp", "C-Reactive Protein (CRP) (mg/L)", value = 0.9, min = 0, max = 100, step = 0.1),
+                               numericInput("crp", "C-Reactive Protein (CRP) (mg/L)", value = NA, min = 0, max = 100, step = 0.1),
                                
                                hr(style = "border-color: #f5f5f7; margin: 12px 0;"),
                                
@@ -66,12 +82,12 @@ ui <- fluidPage(
                                   "Complete Blood Count"),
                                
                                fluidRow(
-                                 column(6, numericInput("wbc", "WBC (10³/µL)", value = 4.7, min = 1, max = 30, step = 0.1)),
-                                 column(6, numericInput("mcv", "MCV (fL)", value = 92, min = 50, max = 130, step = 0.1))
+                                 column(6, numericInput("wbc", "WBC (10³/µL)", value = NA, min = 1, max = 30, step = 0.1)),
+                                 column(6, numericInput("mcv", "MCV (fL)", value = NA, min = 50, max = 130, step = 0.1))
                                ),
                                fluidRow(
-                                 column(6, numericInput("rdw", "RDW (%)", value = 12.8, min = 8, max = 25, step = 0.1)),
-                                 column(6, numericInput("lymph", "Lymph (%)", value = 42, min = 5, max = 80, step = 0.1))
+                                 column(6, numericInput("rdw", "RDW (%)", value = NA, min = 8, max = 25, step = 0.1)),
+                                 column(6, numericInput("lymph", "Lymph (%)", value = NA, min = 5, max = 80, step = 0.1))
                                ),
                                
                                actionButton("calculate", "Calculate", class = "btn-calculate")

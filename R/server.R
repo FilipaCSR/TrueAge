@@ -6,6 +6,86 @@
 
 server <- function(input, output, session) {
   
+  # =============================================================================
+  # FILE UPLOAD HANDLING
+  # =============================================================================
+  
+  # Reactive to store upload results
+  upload_result <- reactiveVal(NULL)
+  
+  # Process uploaded file(s)
+  observeEvent(input$lab_file, {
+    req(input$lab_file)
+    
+    # Process multiple lab reports
+    result <- process_multiple_lab_reports(input$lab_file)
+    upload_result(result)
+    
+    if (result$success && !is.null(result$values)) {
+      # Update input fields with extracted values
+      values <- result$values
+      
+      if (!is.na(values$age)) {
+        updateNumericInput(session, "age", value = round(values$age))
+      }
+      if (!is.na(values$sex)) {
+        updateSelectInput(session, "sex", selected = values$sex)
+      }
+      if (!is.na(values$albumin)) {
+        updateNumericInput(session, "albumin", value = round(values$albumin, 1))
+      }
+      if (!is.na(values$alp)) {
+        updateNumericInput(session, "alp", value = round(values$alp))
+      }
+      if (!is.na(values$creatinine)) {
+        updateNumericInput(session, "creatinine", value = round(values$creatinine, 2))
+      }
+      if (!is.na(values$hba1c)) {
+        updateNumericInput(session, "hba1c", value = round(values$hba1c, 1))
+      }
+      if (!is.na(values$crp)) {
+        updateNumericInput(session, "crp", value = round(values$crp, 1))
+      }
+      if (!is.na(values$wbc)) {
+        updateNumericInput(session, "wbc", value = round(values$wbc, 1))
+      }
+      if (!is.na(values$mcv)) {
+        updateNumericInput(session, "mcv", value = round(values$mcv, 1))
+      }
+      if (!is.na(values$rdw)) {
+        updateNumericInput(session, "rdw", value = round(values$rdw, 1))
+      }
+      if (!is.na(values$lymph)) {
+        updateNumericInput(session, "lymph", value = round(values$lymph, 1))
+      }
+    }
+  })
+  
+  # Output: Upload status message
+  output$upload_status <- renderUI({
+    result <- upload_result()
+    
+    if (is.null(result)) {
+      return(NULL)
+    }
+    
+    if (result$success) {
+      div(class = "upload-success",
+          tags$span(class = "upload-icon", "✓"),
+          tags$span(result$message)
+      )
+    } else {
+      div(class = "upload-error",
+          tags$span(class = "upload-icon", "⚠"),
+          tags$span(result$message)
+      )
+    }
+  })
+  
+  # =============================================================================
+  # BIOLOGICAL AGE CALCULATION
+  # =============================================================================
+  
   # Reactive: Calculate biological age when button is pressed
   results <- eventReactive(input$calculate, {
     

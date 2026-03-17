@@ -127,6 +127,72 @@ body {
   letter-spacing: 0.2px;
 }
 
+/* Upload Card - Special styling */
+.upload-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px dashed #EBEBEB;
+  text-align: center;
+}
+
+.upload-card:hover {
+  border-color: #1C4A3E;
+}
+
+.upload-card .form-group {
+  margin-bottom: 0;
+}
+
+.upload-card .btn-default {
+  background: #1B3A5C;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.upload-card .btn-default:hover {
+  background: #142d47;
+}
+
+.upload-card .form-control {
+  border: 1px solid #EBEBEB;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* Upload status messages */
+.upload-success {
+  background: rgba(45, 122, 95, 0.1);
+  border: 1px solid #2D7A5F;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #1C4A3E;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.upload-error {
+  background: rgba(196, 98, 45, 0.1);
+  border: 1px solid #C4622D;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #C4622D;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.upload-icon {
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
 /* Cards - Compact */
 .apple-card {
   background: #ffffff;
